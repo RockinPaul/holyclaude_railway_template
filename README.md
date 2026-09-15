@@ -28,7 +28,8 @@ image — it adapts three things to Railway and changes nothing else:
 | `ANTHROPIC_API_KEY` | *(empty)* | Optional. Pay-as-you-go instead of signing in with a subscription. |
 | `CLAUDE_CODE_OAUTH_TOKEN` | *(empty)* | Optional. From `claude setup-token` on your own machine, for Pro/Max plans. |
 | `CLOUDCLI_USERNAME` | `admin` | Baked into the image. Add the variable to change it before the first boot. |
-| `PORT` / `HOST` | `3001` / `::` | Baked. Upstream's service script runs `cloudcli --port 3001` literally. |
+| `PORT` | `3001` | Railway's healthcheck probes this port, so the service script was changed to honour it. Leave it alone — the domain targets 3001. |
+| `HOST` | `::` | Baked. Dual-stack bind. |
 | `DATABASE_PATH` | `/home/claude/.claude/.cloudcli/auth.db` | Baked. Puts the account database on the volume. |
 
 The deploy form asks for nothing. Other provider keys — `GEMINI_API_KEY`, `OPENAI_API_KEY`,
@@ -101,6 +102,10 @@ agent runs. Files on the volume are untouched.
   unreachable cwd, and the boot fails far from the cause.
 - **`HOST=::`.** Node binds dual-stack, so the service answers both Railway's edge and the
   IPv6-only private network.
+- **`PORT` had to become real.** Railway's healthcheck probes the port named by the `PORT` service
+  variable — not the domain's target port — so a server that ignored `PORT` failed every healthcheck
+  while listening perfectly well on 3001. Upstream's s6 service script hard-codes
+  `cloudcli --port 3001`; this image ships the same script with `--port "${PORT:-3001}"`.
 - **Chromium needs nothing special here.** The image already bakes
   `CHROMIUM_FLAGS=--no-sandbox --disable-gpu --disable-dev-shm-usage`, so the `SYS_ADMIN`,
   `seccomp=unconfined` and `shm_size: 2g` from upstream's Compose file are not required — verified

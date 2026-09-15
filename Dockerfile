@@ -16,8 +16,9 @@ USER root
 # curl is already present (the upstream HEALTHCHECK uses it); it is what creates
 # the CloudCLI account from inside the container.
 
-# PORT is fixed at 3001 because upstream's s6 service script runs
-# `cloudcli --port 3001` literally. Railway's domain targets that port.
+# PORT is 3001 by default and is honoured for real: the service script below is
+# upstream's with `--port "${PORT:-3001}"` in place of the literal. Railway's
+# healthcheck probes whatever PORT names, so the two must not drift apart.
 #
 # CLOUDCLI_USERNAME is baked rather than declared as a template variable:
 # template generation nulls literal defaults into required fields, which would
@@ -38,6 +39,12 @@ ENV PORT=3001 \
     DATABASE_PATH=/home/claude/.claude/.cloudcli/auth.db
 
 COPY --chmod=755 entrypoint.sh /usr/local/bin/railway-entrypoint
+
+# Upstream's service script runs `cloudcli --port 3001` literally. Railway's
+# healthcheck probes the port named by the PORT variable, so the server has to
+# follow it or every deploy fails its healthcheck while the app is listening
+# perfectly well on 3001. This is upstream's script with that one change.
+COPY --chmod=755 s6-overlay/s6-rc.d/cloudcli/run /etc/s6-overlay/s6-rc.d/cloudcli/run
 
 EXPOSE 3001
 

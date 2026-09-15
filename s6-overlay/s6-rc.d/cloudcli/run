@@ -1,0 +1,18 @@
+#!/command/with-contenv sh
+# shellcheck shell=sh
+#
+# Upstream's own service script, with one change: the port comes from $PORT.
+#
+# Upstream runs `cloudcli --port 3001` literally, which is right for a Compose
+# file that publishes 3001. On Railway the healthcheck probes the port named by
+# the PORT service variable, so a PORT that the server ignored would fail every
+# deploy while the app sat there listening on 3001. Honouring it keeps the
+# variable, the healthcheck and the server in agreement.
+cd /workspace || exit 1
+export HOME=/home/claude
+export WORKSPACES_ROOT=/workspace
+export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--no-deprecation"
+if [ "$(id -u)" = "0" ]; then
+  exec s6-setuidgid claude cloudcli --port "${PORT:-3001}"
+fi
+exec cloudcli --port "${PORT:-3001}"
