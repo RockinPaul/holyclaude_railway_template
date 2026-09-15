@@ -46,10 +46,12 @@ web UI.
 3. Sign in to Anthropic from the web UI (the same OAuth flow as desktop Claude Code), or set
    `ANTHROPIC_API_KEY`.
 
-The account already exists when you arrive — the entrypoint registers it as soon as the server is
-listening. That is deliberate: CloudCLI's own first-run flow is "open the page and create an
-account", which is safe bound to `127.0.0.1` and unsafe on a public domain, where the first visitor
-to reach the URL would own a machine holding your Anthropic session.
+The account already exists when you arrive. CloudCLI's own first-run flow is "open the page and
+create an account", which is safe bound to `127.0.0.1` and unsafe on a public domain, where the
+first visitor to reach the URL would own a machine holding your Anthropic session. So the entrypoint
+creates it first, against a loopback-only instance of the server, **before** the public one is
+started — and refuses to start at all if that fails. Registering in the background while the real
+server came up was the first attempt, and it lost the race on Railway.
 
 ## Security
 
@@ -61,8 +63,9 @@ as it can be, and it is still further out than upstream intends.
 
 What is actually true of the login, measured against a running deployment:
 
-- Single user. Registration returns **403** once the account exists, so the URL cannot be claimed by
-  a visitor.
+- Single user, and the account is claimed before the service is exposed. Registration returns
+  **403** from the first request the public port ever answers — measured by polling it from the
+  moment it responds, not inferred.
 - Passwords are bcrypt at cost 12. A wrong password returns **401**, unauthenticated API calls
   return **401**, and the JWT is signed with a per-installation secret kept in the database.
 - **There is no login rate limiting.** The generated 24-character password is what carries the
