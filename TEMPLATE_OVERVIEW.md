@@ -54,13 +54,13 @@ server, before the public one starts — and refuses to boot if that fails.
 
 ### Deployment Dependencies
 
-- Upstream project: <https://github.com/CoderLuii/HolyClaude> (MIT), image
+- Upstream project: [CoderLuii/HolyClaude](https://github.com/CoderLuii/HolyClaude) (MIT), image
   `coderluii/holyclaude:1.6.1`.
 - Web UI: `@cloudcli-ai/cloudcli` (upstream `siteboon/claudecodeui`), **AGPL-3.0-or-later**,
   shipped unmodified.
 - Claude Code is Anthropic's proprietary CLI, used with your own account:
-  <https://docs.claude.com/en/docs/claude-code/overview>.
-- Template source: <https://github.com/RockinPaul/holyclaude_railway_template> (MIT).
+  [docs.claude.com/en/docs/claude-code/overview](https://docs.claude.com/en/docs/claude-code/overview).
+- Template source: [RockinPaul/holyclaude_railway_template](https://github.com/RockinPaul/holyclaude_railway_template) (MIT).
 
 ### Implementation Details
 
