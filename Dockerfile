@@ -5,7 +5,7 @@
 # account in the browser. Railway gives a single volume, a public domain and an
 # IPv6 private network, so this image is a thin wrapper that adapts those three
 # things and changes nothing else.
-ARG HOLYCLAUDE_VERSION=1.6.1
+ARG HOLYCLAUDE_VERSION=1.6.8
 FROM coderluii/holyclaude:${HOLYCLAUDE_VERSION}
 
 # The base image ends as root and drops to the `claude` user itself, through

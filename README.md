@@ -10,7 +10,7 @@ Railway with its state on a volume and its web UI behind a generated password.
 
 | Service | Base | Public | Role |
 |---|---|---|---|
-| `holyclaude` | `coderluii/holyclaude:1.6.1` | **yes** | The whole workstation. s6-overlay supervises CloudCLI, Xvfb and the session bridge. |
+| `holyclaude` | `coderluii/holyclaude:1.6.8` | **yes** | The whole workstation. s6-overlay supervises CloudCLI, Xvfb and the session bridge. |
 
 One service, no gateway: CloudCLI speaks plain HTTP and WebSocket on port 3001, which is what
 Railway's edge expects. This repository is a thin wrapper around upstream's published multi-arch
